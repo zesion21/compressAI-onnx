@@ -31,7 +31,7 @@ int loadImage(std::string inputPath, cv::Mat &blob, int &height, int &width)
 
 int save2csv(int total_elements, auto output_data, std::string name)
 {
-    std::ofstream output_file("E:/work2/c/oxxn_runtime_demo/output_" + name + ".csv"); // 输出文件路径
+    std::ofstream output_file("../../out/output_" + name + ".csv"); // 输出文件路径
     if (!output_file.is_open())
     {
         std::cerr << "Failed to open output file!" << std::endl;
@@ -90,8 +90,8 @@ int main()
 
         // 加载模型
         const ORTCHAR_T *modelPath = L"../models/bmshj2018_factorized_encoder.onnx";
-        std::string inputPath = "E:/work2/pythonProjects/CompressAI-master/examples/assets/stmalo_fracape.png";
-        std::string outPath = "E:/work2/pythonProjects/CompressAI-master/examples/assets/onnx_stmalo_fracape_768_512.bin";
+        std::string inputPath = "E:/work2/c/engine_runtime/1.jpg";
+        std::string outPath = "E:/work2/pythonProjects/CompressAI-master/examples/assets/onnx_1_1024_1024.bin";
         Ort::Session session(env, modelPath, session_options);
 
         int imageHeight = 0;
@@ -109,9 +109,12 @@ int main()
         std::vector<const char *> input_names = {"input"};
         std::vector<const char *> output_names = {"x_out", "indexes", "medians"};
 
+        auto inputData = input_tensor.GetTensorMutableData<float>();
+        save2csv(1 * 3 * imageHeight * imageWidth, inputData, "inputData");
+
         // 运行推理
         auto output_tensors = session.Run(Ort::RunOptions{nullptr}, input_names.data(), &input_tensor, 1, output_names.data(), 3);
-
+        std::cout << "imageHeight:" << imageHeight << "  imageWidth:" << imageWidth << std::endl;
         // 承接运行结果
         int latent_h = imageHeight / 16;
         int latent_w = imageWidth / 16;
